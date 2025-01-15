@@ -1,0 +1,8 @@
+# go-sqliter
+Go package to make sqlite concurrency easier
+
+## Purpose
+SQLite is great for all the reasons one can easily go read for themselves. The main pain point out of the box, in my experience, is safe concurrency. This package is intended to make using SQLite with Go projects safe for concurrent writes, especially to the same DB table. The trade off is some write performance for saftey (no or greatly reduced deadlocks). If you don't care about table write deadlocks, then ignore me and do what you want. The package more or less implements a "single writer + many reader" wrapper around SQLite.
+
+## Details
+This package provides a struct (Sqliter) that wraps the Go standard library's sql.Db struct and passes through most of the function calls. The function calls that are not passed through are those related to prepared statements that include table writes. The Sqliter struct spins up a Go routine who's only job is to read from an in memory map of queued up prepared statements + query params (statement queue) and attempt to write them. The Sqlite struct also provides a function (Exec) that takes a prepared statement + query params, adds them to the statement queue, and blocks until the statement has been executed. The statement queue and single writer Go routine guarantees that table writes occur atomically one at a time, so there are no table writes stepping on each other. The blocking Exec function helps callers know that the write has either succeeded or failed sequentially. This package always attempts to open the SQLite connection with WAL journalling.
