@@ -80,6 +80,7 @@ func (s *Sqliter) Close() {
 
 	s.statementQueueCancel()
 	s.db.Close()
+	s.db = nil
 }
 
 func (s *Sqliter) doWrites() {
