@@ -178,3 +178,19 @@ func (s *Sqliter) Exec(statement *sql.Stmt, arguments []any) error {
 
 	return nil
 }
+
+func (s *Sqliter) Prepare(query string) (*sql.Stmt, error) {
+	if s.db == nil {
+		return nil, fmt.Errorf("db not initialized")
+	}
+
+	return s.db.Prepare(query)
+}
+
+func (s *Sqliter) Query(query string, args ...any) (*sql.Rows, error) {
+	if s.db == nil {
+		return nil, fmt.Errorf("db not initialized")
+	}
+
+	return s.db.Query(query, args)
+}
